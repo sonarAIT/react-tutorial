@@ -9,6 +9,7 @@ type HandType = {
     col: number;
     turn: string;
 };
+type HistoryType = Array<{ squares: SquaresType; hand: HandType | null }>;
 
 type SquareProps = {
     value: SquareType;
@@ -59,8 +60,47 @@ class Board extends React.Component<BoardProps> {
     }
 }
 
+type MoveProps = {
+    history: HistoryType;
+    jumpTo: (i: number) => void;
+    pushedMoveIdx: number | null;
+};
+function Move(props: MoveProps) {
+    return (
+        <div>
+            {props.history.map((step, move) => {
+                const desc = move ? "Go to move #" + move : "Go to game start";
+                let rowANDcol = null;
+                if (step.hand !== null) {
+                    rowANDcol = (
+                        <p>
+                            {step.hand.turn}: {step.hand.row}, {step.hand.col}
+                        </p>
+                    );
+                }
+
+                return (
+                    <li
+                        key={move}
+                        className={
+                            props.pushedMoveIdx === move ? "clicked" : ""
+                        }
+                    >
+                        <div>
+                            <button onClick={() => props.jumpTo(move)}>
+                                {desc}
+                            </button>
+                            {rowANDcol}
+                        </div>
+                    </li>
+                );
+            })}
+        </div>
+    );
+}
+
 type GameState = {
-    history: Array<{ squares: SquaresType; hand: HandType | null }>;
+    history: HistoryType;
     stepNumber: number;
     xIsNext: boolean;
     pushedMoveIdx: number | null;
@@ -122,34 +162,6 @@ class Game extends React.Component<{}, GameState> {
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
 
-        const moves = history.map((step, move) => {
-            const desc = move ? "Go to move #" + move : "Go to game start";
-            let rowANDcol = null;
-            if (step.hand !== null) {
-                rowANDcol = (
-                    <p>
-                        {step.hand.turn}: {step.hand.row}, {step.hand.col}
-                    </p>
-                );
-            }
-
-            return (
-                <li
-                    key={move}
-                    className={
-                        this.state.pushedMoveIdx === move ? "clicked" : ""
-                    }
-                >
-                    <div>
-                        <button onClick={() => this.jumpTo(move)}>
-                            {desc}
-                        </button>
-                        {rowANDcol}
-                    </div>
-                </li>
-            );
-        });
-
         let status;
         if (winner) {
             status = "Winner: " + winner;
@@ -167,7 +179,13 @@ class Game extends React.Component<{}, GameState> {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol>{moves}</ol>
+                    <ol>
+                        <Move
+                            history={history}
+                            jumpTo={(i) => this.jumpTo(i)}
+                            pushedMoveIdx={this.state.pushedMoveIdx}
+                        />
+                    </ol>
                 </div>
             </div>
         );
