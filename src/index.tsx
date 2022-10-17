@@ -59,38 +59,41 @@ type MoveProps = {
     jumpTo: (i: number) => void;
     pushedMoveIdx: number | null;
 };
-function Move(props: MoveProps) {
-    return (
-        <div>
-            {props.history.map((step, move) => {
-                const desc = move ? "Go to move #" + move : "Go to game start";
-                let rowANDcol = null;
-                if (step.hand !== null) {
-                    rowANDcol = (
-                        <p>
-                            {step.hand.turn}: {step.hand.row}, {step.hand.col}
-                        </p>
-                    );
-                }
 
-                return (
-                    <li
-                        key={move}
-                        className={
-                            props.pushedMoveIdx === move ? "clicked" : ""
-                        }
-                    >
-                        <div>
-                            <button onClick={() => props.jumpTo(move)}>
-                                {desc}
-                            </button>
-                            {rowANDcol}
-                        </div>
-                    </li>
-                );
-            })}
-        </div>
-    );
+function Move(props: MoveProps) {
+    const [isDesc, setIsDesc] = React.useState(false);
+    const historyElementArray = props.history.map((step, move) => {
+        const desc = move ? "Go to move #" + move : "Go to game start";
+        let rowANDcol = null;
+        if (step.hand !== null) {
+            rowANDcol = (
+                <p>
+                    {step.hand.turn}: {step.hand.row}, {step.hand.col}
+                </p>
+            );
+        }
+
+        return (
+            <li
+                key={move}
+                className={props.pushedMoveIdx === move ? "clicked" : ""}
+            >
+                <div>
+                    <button onClick={() => props.jumpTo(move)}>{desc}</button>
+                    {rowANDcol}
+                </div>
+            </li>
+        );
+    });
+    
+    if (isDesc) {
+        historyElementArray.reverse();
+    }
+
+    return <div>
+        <button onClick={() => setIsDesc(!isDesc)}>sort</button>
+        <ol reversed={isDesc}>{historyElementArray}</ol>
+    </div>;
 }
 
 type GameState = {
@@ -173,13 +176,11 @@ class Game extends React.Component<{}, GameState> {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol>
                         <Move
                             history={history}
                             jumpTo={(i) => this.jumpTo(i)}
                             pushedMoveIdx={this.state.pushedMoveIdx}
                         />
-                    </ol>
                 </div>
             </div>
         );
