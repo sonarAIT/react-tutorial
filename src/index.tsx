@@ -5,10 +5,10 @@ import "./index.css";
 type SquareType = string | null;
 type SquaresType = Array<SquareType>;
 type HandType = {
-    row: number,
-    col: number,
-    turn: string
-}
+    row: number;
+    col: number;
+    turn: string;
+};
 
 type SquareProps = {
     value: SquareType;
@@ -60,9 +60,10 @@ class Board extends React.Component<BoardProps> {
 }
 
 type GameState = {
-    history: Array<{ squares: SquaresType, hand: HandType | null }>;
+    history: Array<{ squares: SquaresType; hand: HandType | null }>;
     stepNumber: number;
     xIsNext: boolean;
+    pushedMoveIdx: number | null;
 };
 class Game extends React.Component<{}, GameState> {
     constructor(props: {}) {
@@ -76,6 +77,7 @@ class Game extends React.Component<{}, GameState> {
             ],
             stepNumber: 0,
             xIsNext: true,
+            pushedMoveIdx: null
         };
     }
 
@@ -103,6 +105,7 @@ class Game extends React.Component<{}, GameState> {
             ]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
+            pushedMoveIdx: null
         });
     }
 
@@ -110,6 +113,7 @@ class Game extends React.Component<{}, GameState> {
         this.setState({
             stepNumber: step,
             xIsNext: step % 2 === 0,
+            pushedMoveIdx: step
         });
     }
 
@@ -122,15 +126,30 @@ class Game extends React.Component<{}, GameState> {
             const desc = move ? "Go to move #" + move : "Go to game start";
             let rowANDcol = null;
             if (step.hand !== null) {
-                rowANDcol = (<p>{step.hand.turn}: {step.hand.row}, {step.hand.col}</p>);
+                rowANDcol = (
+                    <p>
+                        {step.hand.turn}: {step.hand.row}, {step.hand.col}
+                    </p>
+                );
             }
             
-            return (
-                <li key={move}>
-                    {rowANDcol}
+            const inner = (
+                <div>
                     <button onClick={() => this.jumpTo(move)}>{desc}</button>
-                </li>
+                    {rowANDcol}
+                </div>
             );
+            const li =
+                this.state.pushedMoveIdx === move ? (
+                    <li key={move} className="clicked">
+                        {inner}
+                    </li>
+                ) : (
+                    <li key={move}>
+                        {inner}
+                    </li>
+                );
+            return li;
         });
 
         let status;
