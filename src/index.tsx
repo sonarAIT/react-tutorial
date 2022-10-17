@@ -4,6 +4,11 @@ import "./index.css";
 
 type SquareType = string | null;
 type SquaresType = Array<SquareType>;
+type HandType = {
+    row: number,
+    col: number,
+    turn: string
+}
 
 type SquareProps = {
     value: SquareType;
@@ -55,7 +60,7 @@ class Board extends React.Component<BoardProps> {
 }
 
 type GameState = {
-    history: Array<{ squares: SquaresType }>;
+    history: Array<{ squares: SquaresType, hand: HandType | null }>;
     stepNumber: number;
     xIsNext: boolean;
 };
@@ -66,6 +71,7 @@ class Game extends React.Component<{}, GameState> {
             history: [
                 {
                     squares: Array(9).fill(null),
+                    hand: null,
                 },
             ],
             stepNumber: 0,
@@ -80,11 +86,19 @@ class Game extends React.Component<{}, GameState> {
         if (calculateWinner(squares) || squares[i]) {
             return;
         }
-        squares[i] = this.state.xIsNext ? "X" : "O";
+
+        const nowTurn = this.state.xIsNext ? "X" : "O";
+        squares[i] = nowTurn;
+
+        const row = Math.floor(i / 3);
+        const col = i % 3;
+        const hand = { row: row, col: col, turn: nowTurn };
+
         this.setState({
             history: history.concat([
                 {
                     squares: squares,
+                    hand: hand,
                 },
             ]),
             stepNumber: history.length,
@@ -106,8 +120,14 @@ class Game extends React.Component<{}, GameState> {
 
         const moves = history.map((step, move) => {
             const desc = move ? "Go to move #" + move : "Go to game start";
+            let rowANDcol = null;
+            if (step.hand !== null) {
+                rowANDcol = (<p>{step.hand.turn}: {step.hand.row}, {step.hand.col}</p>);
+            }
+            
             return (
                 <li key={move}>
+                    {rowANDcol}
                     <button onClick={() => this.jumpTo(move)}>{desc}</button>
                 </li>
             );
