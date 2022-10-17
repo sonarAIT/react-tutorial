@@ -77,7 +77,7 @@ class Game extends React.Component<{}, GameState> {
             ],
             stepNumber: 0,
             xIsNext: true,
-            pushedMoveIdx: null
+            pushedMoveIdx: null,
         };
     }
 
@@ -105,7 +105,7 @@ class Game extends React.Component<{}, GameState> {
             ]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
-            pushedMoveIdx: null
+            pushedMoveIdx: null,
         });
     }
 
@@ -113,7 +113,7 @@ class Game extends React.Component<{}, GameState> {
         this.setState({
             stepNumber: step,
             xIsNext: step % 2 === 0,
-            pushedMoveIdx: step
+            pushedMoveIdx: step,
         });
     }
 
@@ -132,24 +132,22 @@ class Game extends React.Component<{}, GameState> {
                     </p>
                 );
             }
-            
-            const inner = (
-                <div>
-                    <button onClick={() => this.jumpTo(move)}>{desc}</button>
-                    {rowANDcol}
-                </div>
+
+            return (
+                <li
+                    key={move}
+                    className={
+                        this.state.pushedMoveIdx === move ? "clicked" : ""
+                    }
+                >
+                    <div>
+                        <button onClick={() => this.jumpTo(move)}>
+                            {desc}
+                        </button>
+                        {rowANDcol}
+                    </div>
+                </li>
             );
-            const li =
-                this.state.pushedMoveIdx === move ? (
-                    <li key={move} className="clicked">
-                        {inner}
-                    </li>
-                ) : (
-                    <li key={move}>
-                        {inner}
-                    </li>
-                );
-            return li;
         });
 
         let status;
