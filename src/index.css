@@ -37,6 +37,10 @@ ul {
     outline: none;
 }
 
+.winSquare {
+    background: #0f0;
+}
+
 .kbd-navigation .square:focus {
     background: #ddd;
 }
