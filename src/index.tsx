@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 
-type Square = string | null;
-type Squares = Array<Square>;
+type SquareType = string | null;
+type SquaresType = Array<SquareType>;
 
 type SquareProps = {
-    value: Square;
+    value: SquareType;
     onClick: () => void;
 };
 function Square(props: SquareProps) {
@@ -18,7 +18,7 @@ function Square(props: SquareProps) {
 }
 
 type BoardProps = {
-    squares: Squares;
+    squares: SquaresType;
     onClick: (i: number) => void;
 };
 class Board extends React.Component<BoardProps> {
@@ -55,7 +55,7 @@ class Board extends React.Component<BoardProps> {
 }
 
 type GameState = {
-    history: Array<{ squares: Squares }>;
+    history: Array<{ squares: SquaresType }>;
     stepNumber: number;
     xIsNext: boolean;
 };
@@ -137,7 +137,7 @@ class Game extends React.Component<{}, GameState> {
     }
 }
 
-function calculateWinner(squares: Squares) {
+function calculateWinner(squares: SquaresType) {
     const lines = [
         [0, 1, 2],
         [3, 4, 5],
